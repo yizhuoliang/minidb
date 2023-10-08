@@ -2,10 +2,9 @@
 package msg
 
 type Pair struct {
-	Key        int
-	Value      int
-	Timestamp  uint64
-	Replicated bool
+	Key       int
+	Value     int
+	Timestamp uint64
 }
 
 type Type int
@@ -28,20 +27,20 @@ const (
 )
 
 type Command struct {
-	Type            Type
-	Pair            Pair
-	TxnNumber       int
-	SiteNumber      int
-	CommitTimestamp uint64
-	WritesToCommit  *[]Pair
+	Type           Type
+	Pair           Pair
+	TxnNumber      int
+	SiteNumber     int
+	Timestamp      uint64
+	WritesToCommit *[]Pair
 }
 
 type Response struct {
-	Type        Type
-	Pair        Pair
-	TxnNumber   int
-	SiteNumber  int
-	PairsDumped *[]Pair
+	Type          Type
+	Pair          Pair
+	TxnNumber     int
+	ManagerNumber int
+	PairsDumped   *[]Pair
 }
 
 type TxnManagerState struct {

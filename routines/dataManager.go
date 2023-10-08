@@ -1,25 +1,24 @@
 package routines
 
 import (
-	"fmt"
+	"log"
 	"minidb/msg"
 )
 
 type DataManagerState struct {
-	managerNumber        int
-	isUp                 bool
-	table                [21]*msg.Pair
-	readyTable           [21]bool
-	commandChan          chan *msg.Command
-	responseChan         chan *msg.Response
-	UncommittedTxnWrites map[int][]msg.Pair
+	managerNumber int
+	isUp          bool
+	table         [21][]msg.Pair
+	readyTable    [21]bool
+	commandChan   chan *msg.Command
+	responseChan  chan *msg.Response
 }
 
-func NewDataManager(managerNumber int, isUp bool, commandChan chan *msg.Command, responseChan chan *msg.Response, initTime uint64) DataManagerState {
+func NewDataManager(managerNumber int, commandChan chan *msg.Command, responseChan chan *msg.Response, initTime uint64) DataManagerState {
 	// build a new DM state
 	newDM := DataManagerState{
 		managerNumber: managerNumber,
-		isUp:          isUp,
+		isUp:          true,
 		commandChan:   commandChan,
 		responseChan:  responseChan,
 		// UncommittedTxnWrites: make(map[int][]msg.Pair),
@@ -27,15 +26,15 @@ func NewDataManager(managerNumber int, isUp bool, commandChan chan *msg.Command,
 
 	// initialize the data tables
 	for key := 2; key <= 20; key++ {
-		newDM.table[key] = &msg.Pair{Key: key, Value: key * 10, Timestamp: initTime, Replicated: true}
+		newDM.table[key] = []msg.Pair{{Key: key, Value: key * 10, Timestamp: initTime}}
 		newDM.readyTable[key] = true
 	}
 	// only even indexed sites have monopolized keys
 	if managerNumber%2 == 0 {
 		key1 := managerNumber - 1
 		key2 := managerNumber + 9
-		newDM.table[key1] = &msg.Pair{Key: key1, Value: key1 * 10, Timestamp: initTime, Replicated: false}
-		newDM.table[key2] = &msg.Pair{Key: key2, Value: key2 * 10, Timestamp: initTime, Replicated: false}
+		newDM.table[key1] = []msg.Pair{{Key: key1, Value: key1 * 10, Timestamp: initTime}}
+		newDM.table[key2] = []msg.Pair{{Key: key2, Value: key2 * 10, Timestamp: initTime}}
 		newDM.readyTable[key1] = true
 		newDM.readyTable[key2] = true
 	}
@@ -47,8 +46,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 	for {
 		command, ok := <-s.commandChan
 		if !ok {
-			fmt.Println("ERROR: commandChan closed!")
-			break
+			log.Fatal("ERROR: commandChan closed!")
 		}
 
 		switch command.Type {
@@ -60,10 +58,15 @@ func (s *DataManagerState) DataManagerRoutine() {
 
 			key := command.Pair.Key
 			if s.readyTable[key] && s.table[key] != nil {
-				s.responseChan <- &msg.Response{Type: msg.Read, Pair: *s.table[key]}
-			} else {
-				s.responseChan <- &msg.Response{Type: msg.Error}
+				versions := s.table[key]
+				for i := len(versions) - 1; i >= 0; i-- {
+					if versions[i].Timestamp < command.Timestamp {
+						s.responseChan <- &msg.Response{Type: msg.Read, ManagerNumber: s.managerNumber, Pair: versions[i]}
+						return
+					}
+				}
 			}
+			s.responseChan <- &msg.Response{Type: msg.Error}
 
 		// case msg.Write:
 		// 	if !s.isUp {
@@ -85,7 +88,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 			}
 
 			for _, write := range *command.WritesToCommit {
-				s.table[write.Key] = &msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.CommitTimestamp, Replicated: write.Replicated}
+				s.table[write.Key] = append(s.table[write.Key], msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.Timestamp})
 				s.readyTable[write.Key] = true
 			}
 
@@ -94,6 +97,8 @@ func (s *DataManagerState) DataManagerRoutine() {
 		case msg.Fail:
 			// just turn off isUp
 			s.isUp = false
+			// isn't it weird to reply "success" for failing haha
+			s.responseChan <- &msg.Response{Type: msg.Success}
 
 		case msg.Recover:
 			// turn on isUp and set the replicated data to be not ready
@@ -105,9 +110,9 @@ func (s *DataManagerState) DataManagerRoutine() {
 
 		case msg.DumpRead:
 			dumped := make([]msg.Pair, 0)
-			for _, pair := range s.table {
-				if pair != nil {
-					dumped = append(dumped, *pair)
+			for _, versions := range s.table {
+				if versions != nil {
+					dumped = append(dumped, versions[len(versions)-1])
 				}
 			}
 			s.responseChan <- &msg.Response{Type: msg.DumpRead, PairsDumped: &dumped}
