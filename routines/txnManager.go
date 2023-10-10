@@ -206,7 +206,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// enforcing the "first commiter wins" rule
 			// for every written key, check if there are new commit history after this txn starts
 			for _, write := range txn.writes {
-				if s.commitHistories[write.Key][len(s.commitHistories)-1] >= txn.timeStart {
+				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1] >= txn.timeStart {
 					// someone else commited the value we wrote, so abort
 					s.abort(txnNumber)
 				}

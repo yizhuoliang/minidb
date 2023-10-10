@@ -25,7 +25,7 @@ func NewDataManager(managerNumber int, commandChan chan *msg.Command, responseCh
 	}
 
 	// initialize the data tables
-	for key := 2; key <= 20; key++ {
+	for key := 2; key <= 20; key += 2 {
 		newDM.table[key] = []msg.Pair{{Key: key, Value: key * 10, Timestamp: initTime}}
 		newDM.readyTable[key] = true
 	}
@@ -54,6 +54,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 			// if down, always respond error
 			if !s.isUp {
 				s.responseChan <- &msg.Response{Type: msg.Error}
+				continue
 			}
 
 			key := command.Pair.Key
@@ -85,6 +86,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 		case msg.Commit:
 			if !s.isUp {
 				s.responseChan <- &msg.Response{Type: msg.Error}
+				continue
 			}
 
 			for _, write := range *command.WritesToCommit {
