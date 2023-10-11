@@ -39,7 +39,7 @@ func (g *Graph) GetNeighbors(node *Node) []*Node {
 	return neighbors
 }
 
-func (g *Graph) hasCycleWithConsecutiveRWEdges() bool {
+func (g *Graph) HasCycleWithConsecutiveRWEdges() bool {
 	cycles := g.FindCycles()
 	for _, cycle := range cycles {
 		if len(cycle) == 1 {

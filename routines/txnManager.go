@@ -15,9 +15,11 @@ const (
 )
 
 type ongoingTxn struct {
-	timeStart  uint64
-	writes     map[int]msg.Pair
-	dmAccessed [NUMBER_OF_DMS + 1]bool
+	txnNumber     int
+	timeStart     uint64
+	writes        map[int]msg.Pair
+	externalReads []msg.Pair
+	dmAccessed    [NUMBER_OF_DMS + 1]bool
 }
 
 type TxnManagerState struct {
@@ -93,7 +95,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				log.Fatal("Txn Already Began!!!")
 			}
 			// register new txn
-			s.ongoingTxns[txnNumber] = ongoingTxn{timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0)}
+			s.ongoingTxns[txnNumber] = ongoingTxn{txnNumber: txnNumber, timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0)}
 
 		case "R":
 			// string processing
@@ -176,6 +178,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// record the writes, if there were earlier value written, simply overwrite
 			txn.writes[key] = msg.Pair{Key: key, Value: value}
+			s.ongoingTxns[txnNumber] = txn
 
 		case "dump":
 			// just do dumpRead on every DM
@@ -200,16 +203,22 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// double check the transaction exists
 			txn, ok := s.ongoingTxns[txnNumber]
 			if !ok {
-				log.Fatal("Txn doesn't exist!!!")
+				// if txn not exist, maybe it's already aborted, just do nothing
+				continue
 			}
 
 			// enforcing the "first commiter wins" rule
 			// for every written key, check if there are new commit history after this txn starts
+			aborted := false
 			for _, write := range txn.writes {
 				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1] >= txn.timeStart {
 					// someone else commited the value we wrote, so abort
 					s.abort(txnNumber)
+					aborted = true
 				}
+			}
+			if aborted {
+				continue
 			}
 
 			// this txn is cleared, send Commit commands to DMs
@@ -217,6 +226,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			for _, write := range txn.writes {
 				// update the timestamp!!
 				write.Timestamp = s.timeNow
+				txn.writes[write.Key] = write
 				writesToCommit = append(writesToCommit, write)
 			}
 			for i := 1; i <= NUMBER_OF_DMS; i++ {
@@ -236,6 +246,8 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				history = append(history, write.Timestamp)
 				s.commitHistories[write.Key] = history
 			}
+			// fmt.Print(s.commitHistories)
+			// fmt.Printf("COMMIT T%d", txnNumber)
 
 		case "fail":
 			// string processing
@@ -243,15 +255,28 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Fail}
 			<-s.dmResponseChans[managerNumber]
 
+			// mark this DM as down
+			s.dmUpTable[managerNumber] = false
+
+			// abort all txns that accessed this DM
+			for _, txn := range s.ongoingTxns {
+				if txn.dmAccessed[managerNumber] {
+					s.abort(txn.txnNumber)
+				}
+			}
+
 		case "recover":
 			// string processing
 			managerNumber, _ := strconv.Atoi(cmdContent)
 			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover}
 			<-s.dmResponseChans[managerNumber]
+			// mark this DM as up
+			s.dmUpTable[managerNumber] = true
 
 		default:
 			log.Fatal("Unknown Command!!!")
 		}
+		// fmt.Println(s.ongoingTxns)
 	}
 }
 
@@ -260,7 +285,9 @@ func (s *TxnManagerState) abort(txnNumber int) {
 	if !ok {
 		log.Fatal("Txn doesn't exist!!!")
 	}
+
 	delete(s.ongoingTxns, txnNumber)
+	// tf("Aborting T%d \n", txnNumber)
 }
 
 func isReplicated(key int) bool {
