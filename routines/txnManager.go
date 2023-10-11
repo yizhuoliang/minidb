@@ -14,18 +14,34 @@ const (
 	NUMBER_OF_DMS = 10
 )
 
-type ongoingTxn struct {
-	txnNumber     int
-	timeStart     uint64
-	writes        map[int]msg.Pair
-	externalReads []msg.Pair
-	dmAccessed    [NUMBER_OF_DMS + 1]bool
+/*
+	TODO: for every ongoing txn, add a record of reads
+	for commit history, add who commited
+	in graph, add a map from txn number to *node
+	in the end, check the four types of edges
+*/
+
+type state int
+
+const (
+	// general message types
+	ongoing state = iota
+	aborted
+	write
+)
+
+type txnRecord struct {
+	state      state
+	txnNumber  int
+	timeStart  uint64
+	writes     map[int]msg.Pair
+	dmAccessed [NUMBER_OF_DMS + 1]bool
 }
 
 type TxnManagerState struct {
 	timeNow         uint64
 	commitHistories [21][]uint64 // for enforcing "first commiter wins"
-	ongoingTxns     map[int]ongoingTxn
+	txnRecords      map[int]txnRecord
 	dmUpTable       [11]bool
 	dmCommandChans  []chan *msg.Command
 	dmResponseChans []chan *msg.Response
@@ -33,7 +49,7 @@ type TxnManagerState struct {
 
 func NewTxnManagerAndDataManagers() TxnManagerState {
 	// create & init new TM
-	newTM := TxnManagerState{timeNow: 0, ongoingTxns: make(map[int]ongoingTxn, 0),
+	newTM := TxnManagerState{timeNow: 0, txnRecords: make(map[int]txnRecord, 0),
 		dmCommandChans: make([]chan *msg.Command, 11), dmResponseChans: make([]chan *msg.Response, 11)}
 	for i := 1; i <= NUMBER_OF_DMS; i++ {
 		newTM.dmUpTable[i] = true
@@ -90,12 +106,12 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				log.Fatal("Illegal Command!!!")
 			}
 			// check if txn already registered
-			_, ok := s.ongoingTxns[txnNumber]
+			_, ok := s.txnRecords[txnNumber]
 			if ok {
 				log.Fatal("Txn Already Began!!!")
 			}
 			// register new txn
-			s.ongoingTxns[txnNumber] = ongoingTxn{txnNumber: txnNumber, timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0)}
+			s.txnRecords[txnNumber] = txnRecord{state: ongoing, txnNumber: txnNumber, timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0)}
 
 		case "R":
 			// string processing
@@ -107,7 +123,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 
 			// check if the txn exists and then perform the read
-			txn, ok := s.ongoingTxns[txnNumber]
+			txn, ok := s.txnRecords[txnNumber]
 			if !ok {
 				log.Fatal("Txn doesn't exist!!!")
 			}
@@ -139,7 +155,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// read success, print and add to accessedDM
 			fmt.Println("x", key, ": ", res.Pair.Value)
 			txn.dmAccessed[res.ManagerNumber] = true
-			s.ongoingTxns[txnNumber] = txn
+			s.txnRecords[txnNumber] = txn
 
 		case "W":
 			// string processing
@@ -148,7 +164,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			key, _ := strconv.Atoi(parts[1][1:])
 			value, _ := strconv.Atoi(parts[2])
 			// double check the transaction exists
-			txn, ok := s.ongoingTxns[txnNumber]
+			txn, ok := s.txnRecords[txnNumber]
 			if !ok {
 				log.Fatal("Txn doesn't exist!!!")
 			}
@@ -178,7 +194,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// record the writes, if there were earlier value written, simply overwrite
 			txn.writes[key] = msg.Pair{Key: key, Value: value}
-			s.ongoingTxns[txnNumber] = txn
+			s.txnRecords[txnNumber] = txn
 
 		case "dump":
 			// just do dumpRead on every DM
@@ -201,23 +217,25 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			txnNumberString := cmdContent[1:] // remove the "T"
 			txnNumber, _ := strconv.Atoi(txnNumberString)
 			// double check the transaction exists
-			txn, ok := s.ongoingTxns[txnNumber]
+			txn, ok := s.txnRecords[txnNumber]
 			if !ok {
-				// if txn not exist, maybe it's already aborted, just do nothing
+				log.Fatal("Txn doesn't exist!!!")
+			} else if txn.state == aborted {
+				// if the txn is already aborted, just remove that
 				continue
 			}
 
 			// enforcing the "first commiter wins" rule
 			// for every written key, check if there are new commit history after this txn starts
-			aborted := false
+			needAbort := false
 			for _, write := range txn.writes {
 				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1] >= txn.timeStart {
 					// someone else commited the value we wrote, so abort
 					s.abort(txnNumber)
-					aborted = true
+					needAbort = true
 				}
 			}
-			if aborted {
+			if needAbort {
 				continue
 			}
 
@@ -259,7 +277,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			s.dmUpTable[managerNumber] = false
 
 			// abort all txns that accessed this DM
-			for _, txn := range s.ongoingTxns {
+			for _, txn := range s.txnRecords {
 				if txn.dmAccessed[managerNumber] {
 					s.abort(txn.txnNumber)
 				}
@@ -276,17 +294,19 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 		default:
 			log.Fatal("Unknown Command!!!")
 		}
-		// fmt.Println(s.ongoingTxns)
+		// fmt.Println(s.txnRecords)
 	}
 }
 
 func (s *TxnManagerState) abort(txnNumber int) {
-	_, ok := s.ongoingTxns[txnNumber]
+	_, ok := s.txnRecords[txnNumber]
 	if !ok {
 		log.Fatal("Txn doesn't exist!!!")
 	}
 
-	delete(s.ongoingTxns, txnNumber)
+	record := s.txnRecords[txnNumber]
+	record.state = aborted
+	s.txnRecords[txnNumber] = record
 	// tf("Aborting T%d \n", txnNumber)
 }
 
