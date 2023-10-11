@@ -109,7 +109,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 		case msg.Recover:
 			// turn on isUp and set the replicated data to be not ready
 			s.isUp = true
-			for key := 2; key <= 20; key++ {
+			for key := 2; key <= 20; key += 2 {
 				s.readyTable[key] = false
 			}
 			s.responseChan <- &msg.Response{Type: msg.Success}

@@ -85,9 +85,9 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 }
 
 func (s *TxnManagerState) TxnManagerRoutine() {
-	reader := bufio.NewReader(os.Stdin)
 
 	for {
+		reader := bufio.NewReader(os.Stdin)
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatal("Error reading input:", err)
@@ -147,7 +147,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			var res *msg.Response
 			if writtenPair, writtenExists := txn.writes[key]; writtenExists {
 				// read success, print and then end this command
-				fmt.Println("x", key, ": ", writtenPair.Value)
+				fmt.Printf("x%d: %d\n", key, writtenPair.Value)
 				// just continue, skip any book keeping updates
 				continue
 			} else {
@@ -305,7 +305,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// abort all txns that accessed this DM
 			for _, txn := range s.txnRecords {
-				if txn.dmAccessed[managerNumber] {
+				if txn.state == ongoing && txn.dmAccessed[managerNumber] {
 					s.abort(txn.txnNumber)
 				}
 			}
@@ -313,6 +313,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 		case "recover":
 			// string processing
 			managerNumber, _ := strconv.Atoi(cmdContent)
+			// fmt.Println(cmdContent)
 			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover}
 			<-s.dmResponseChans[managerNumber]
 			// mark this DM as up
