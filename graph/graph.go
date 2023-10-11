@@ -11,21 +11,23 @@ type Edge struct {
 }
 
 type Graph struct {
-	Nodes []*Node
-	Edges []*Edge
+	TxnNodes map[int]*Node
+	Nodes    []*Node
+	Edges    []*Edge
 }
 
 func NewGraph() *Graph {
-	return &Graph{Nodes: make([]*Node, 0), Edges: make([]*Edge, 0)}
+	return &Graph{Nodes: make([]*Node, 0), Edges: make([]*Edge, 0), TxnNodes: make(map[int]*Node, 0)}
 }
 
 func (g *Graph) AddNode(txnNumber int) {
 	newNode := &Node{TxnNumber: txnNumber}
+	g.TxnNodes[txnNumber] = newNode
 	g.Nodes = append(g.Nodes, newNode)
 }
 
-func (g *Graph) AddEdge(from *Node, to *Node, edgeType string) {
-	newEdge := &Edge{From: from, To: to, EdgeType: edgeType}
+func (g *Graph) AddEdge(from int, to int, edgeType string) {
+	newEdge := &Edge{From: g.TxnNodes[from], To: g.TxnNodes[to], EdgeType: edgeType}
 	g.Edges = append(g.Edges, newEdge)
 }
 

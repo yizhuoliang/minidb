@@ -58,16 +58,20 @@ func (s *DataManagerState) DataManagerRoutine() {
 			}
 
 			key := command.Pair.Key
+			served := false
 			if s.readyTable[key] && s.table[key] != nil {
 				versions := s.table[key]
 				for i := len(versions) - 1; i >= 0; i-- {
 					if versions[i].Timestamp < command.Timestamp {
 						s.responseChan <- &msg.Response{Type: msg.Read, ManagerNumber: s.managerNumber, Pair: versions[i]}
-						return
+						served = true
+						break
 					}
 				}
 			}
-			s.responseChan <- &msg.Response{Type: msg.Error}
+			if !served {
+				s.responseChan <- &msg.Response{Type: msg.Error}
+			}
 
 		// case msg.Write:
 		// 	if !s.isUp {
@@ -90,7 +94,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 			}
 
 			for _, write := range *command.WritesToCommit {
-				s.table[write.Key] = append(s.table[write.Key], msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.Timestamp})
+				s.table[write.Key] = append(s.table[write.Key], msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.Timestamp, WhoWrote: write.WhoWrote})
 				s.readyTable[write.Key] = true
 			}
 

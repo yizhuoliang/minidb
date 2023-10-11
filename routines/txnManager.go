@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"minidb/graph"
 	"minidb/msg"
 	"os"
 	"strconv"
@@ -27,24 +28,32 @@ const (
 	// general message types
 	ongoing state = iota
 	aborted
-	write
+	commited
 )
 
 type txnRecord struct {
 	state      state
 	txnNumber  int
 	timeStart  uint64
-	writes     map[int]msg.Pair
+	writes     map[int]msg.Pair // map from key to pair
+	reads      map[int]msg.Pair // map from key to pair
+	readFroms  map[int]bool     // NOTE: map from txnNumber to bool
 	dmAccessed [NUMBER_OF_DMS + 1]bool
+}
+
+type commitHistory struct {
+	timestamp uint64
+	txnNumber int
 }
 
 type TxnManagerState struct {
 	timeNow         uint64
-	commitHistories [21][]uint64 // for enforcing "first commiter wins"
+	commitHistories [21][]commitHistory // for enforcing "first commiter wins"
 	txnRecords      map[int]txnRecord
 	dmUpTable       [11]bool
 	dmCommandChans  []chan *msg.Command
 	dmResponseChans []chan *msg.Response
+	serialGraph     *graph.Graph
 }
 
 func NewTxnManagerAndDataManagers() TxnManagerState {
@@ -57,7 +66,7 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 		newTM.dmResponseChans[i] = make(chan *msg.Response)
 	}
 	for i := 1; i <= 20; i++ {
-		newTM.commitHistories[i] = []uint64{newTM.timeNow}
+		newTM.commitHistories[i] = []commitHistory{{timestamp: newTM.timeNow, txnNumber: 0}}
 	}
 
 	// create new DMs
@@ -65,6 +74,9 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 		newDM := NewDataManager(i, newTM.dmCommandChans[i], newTM.dmResponseChans[i], newTM.timeNow)
 		go newDM.DataManagerRoutine()
 	}
+
+	// init the graph
+	newTM.serialGraph = graph.NewGraph()
 
 	// make sure the first txn start at 1
 	newTM.timeNow = 1
@@ -81,7 +93,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			log.Fatal("Error reading input:", err)
 		}
 
-		// for every command read, increment time!!
+		// for every command, increment time!!
 		s.timeNow++
 
 		// remove any trailing whitespace
@@ -111,7 +123,9 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				log.Fatal("Txn Already Began!!!")
 			}
 			// register new txn
-			s.txnRecords[txnNumber] = txnRecord{state: ongoing, txnNumber: txnNumber, timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0)}
+			s.txnRecords[txnNumber] = txnRecord{state: ongoing, txnNumber: txnNumber, timeStart: s.timeNow, writes: make(map[int]msg.Pair, 0), reads: make(map[int]msg.Pair, 0), readFroms: make(map[int]bool, 0)}
+			// add node to the serialization graph
+			s.serialGraph.AddNode(txnNumber)
 
 		case "R":
 			// string processing
@@ -134,6 +148,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			if writtenPair, writtenExists := txn.writes[key]; writtenExists {
 				// read success, print and then end this command
 				fmt.Println("x", key, ": ", writtenPair.Value)
+				// just continue, skip any book keeping updates
 				continue
 			} else {
 				for i := 1; i <= NUMBER_OF_DMS; i++ {
@@ -154,6 +169,9 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 			// read success, print and add to accessedDM
 			fmt.Println("x", key, ": ", res.Pair.Value)
+			// update the bookkeeping stuff
+			txn.reads[res.Pair.Key] = res.Pair
+			txn.readFroms[res.Pair.WhoWrote] = true
 			txn.dmAccessed[res.ManagerNumber] = true
 			s.txnRecords[txnNumber] = txn
 
@@ -229,7 +247,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// for every written key, check if there are new commit history after this txn starts
 			needAbort := false
 			for _, write := range txn.writes {
-				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1] >= txn.timeStart {
+				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1].timestamp >= txn.timeStart {
 					// someone else commited the value we wrote, so abort
 					s.abort(txnNumber)
 					needAbort = true
@@ -239,11 +257,18 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				continue
 			}
 
+			// enforcing SSI invariant by the graph
+			if !s.checkAndUpdateSerializationGraph(txnNumber) {
+				s.abort(txnNumber)
+				continue
+			}
+
 			// this txn is cleared, send Commit commands to DMs
 			writesToCommit := make([]msg.Pair, 0)
 			for _, write := range txn.writes {
 				// update the timestamp!!
 				write.Timestamp = s.timeNow
+				write.WhoWrote = txnNumber
 				txn.writes[write.Key] = write
 				writesToCommit = append(writesToCommit, write)
 			}
@@ -261,9 +286,11 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// record this commit to the commit histories
 			for _, write := range txn.writes {
 				history := s.commitHistories[write.Key]
-				history = append(history, write.Timestamp)
+				history = append(history, commitHistory{timestamp: write.Timestamp, txnNumber: txnNumber})
 				s.commitHistories[write.Key] = history
 			}
+			txn.state = commited
+			s.txnRecords[txnNumber] = txn
 			// fmt.Print(s.commitHistories)
 			// fmt.Printf("COMMIT T%d", txnNumber)
 
@@ -307,7 +334,52 @@ func (s *TxnManagerState) abort(txnNumber int) {
 	record := s.txnRecords[txnNumber]
 	record.state = aborted
 	s.txnRecords[txnNumber] = record
-	// tf("Aborting T%d \n", txnNumber)
+	fmt.Printf("Aborting T%d \n", txnNumber)
+}
+
+func (s *TxnManagerState) checkAndUpdateSerializationGraph(txnNumber int) bool {
+	thisTxn := s.txnRecords[txnNumber]
+	// first try to add the edges
+	copySerialGraph := *s.serialGraph
+	serialGraph := &copySerialGraph
+	for _, otherTxn := range s.txnRecords {
+		if otherTxn.state == aborted || otherTxn.txnNumber == txnNumber {
+			continue
+		} else if otherTxn.state == commited {
+			// WW EDGES
+			for _, thisWrite := range thisTxn.writes {
+				if _, ok := otherTxn.writes[thisWrite.Key]; ok {
+					serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "ww")
+				}
+			}
+
+			// WR EDGES
+			if thisTxn.readFroms[otherTxn.txnNumber] {
+				serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "wr")
+			}
+		} else { // when otherTxn is ongoing
+			// RW EDGES, thisTxn write
+			for _, thisWrite := range thisTxn.writes {
+				if _, ok := otherTxn.reads[thisWrite.Key]; ok {
+					serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "rw")
+				}
+			}
+			// RW EDGES,
+			for _, thisRead := range thisTxn.reads {
+				if _, ok := otherTxn.writes[thisRead.Key]; ok {
+					serialGraph.AddEdge(txnNumber, otherTxn.txnNumber, "rw")
+				}
+			}
+		}
+	}
+	// check & update
+	if serialGraph.HasCycleWithConsecutiveRWEdges() {
+		fmt.Printf("Aborting T%d because cycle with rw - rw\n", txnNumber)
+		return false
+	} else {
+		s.serialGraph = serialGraph
+		return true
+	}
 }
 
 func isReplicated(key int) bool {

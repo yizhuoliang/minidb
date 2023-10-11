@@ -5,6 +5,7 @@ type Pair struct {
 	Key       int
 	Value     int
 	Timestamp uint64
+	WhoWrote  int
 }
 
 type Type int
