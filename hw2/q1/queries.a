@@ -1,0 +1,11 @@
+CREATE TABLE trades (stocksymbol VARCHAR(7), time INT, quantity INT, price INT);
+LOAD DATA INFILE "trades.csv" INTO TABLE trades FIELDS TERMINATED BY ",";
+stats
+SELECT stocksymbol, SUM(price * quantity) / SUM(quantity) AS weighted_avg_price FROM trades GROUP BY stocksymbol;
+stats
+SELECT AVGS(3, price) FROM trades ASSUMING ASC time GROUP BY stocksymbol;
+stats
+SELECT SUMS(3, price * quantity) / SUMS(3, quantity) FROM trades ASSUMING ASC time GROUP BY stocksymbol;
+stats
+SELECT stocksymbol, max(price - mins(price)) FROM trades ASSUMING ASC time GROUP BY stocksymbol;
+stats

@@ -94,6 +94,11 @@ func (s *DataManagerState) DataManagerRoutine() {
 			}
 
 			for _, write := range *command.WritesToCommit {
+				// if the table entry is empty, this dataManager don't maintain this variable
+				// so it can ignore this update
+				if len(s.table[write.Key]) == 0 {
+					continue
+				}
 				s.table[write.Key] = append(s.table[write.Key], msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.Timestamp, WhoWrote: write.WhoWrote})
 				s.readyTable[write.Key] = true
 			}
@@ -119,6 +124,8 @@ func (s *DataManagerState) DataManagerRoutine() {
 			for _, versions := range s.table {
 				if versions != nil {
 					dumped = append(dumped, versions[len(versions)-1])
+				} else {
+					dumped = append(dumped, msg.Pair{Key: -1, Value: -1})
 				}
 			}
 			s.responseChan <- &msg.Response{Type: msg.DumpRead, PairsDumped: &dumped}

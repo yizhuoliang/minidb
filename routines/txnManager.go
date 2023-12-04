@@ -39,6 +39,7 @@ type txnRecord struct {
 	reads      map[int]msg.Pair // map from key to pair
 	readFroms  map[int]bool     // NOTE: map from txnNumber to bool
 	dmAccessed [NUMBER_OF_DMS + 1]bool
+	reason     string
 }
 
 type commitHistory struct {
@@ -98,6 +99,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 		// remove any trailing whitespace
 		command := strings.TrimSpace(input)
+		command = strings.ReplaceAll(command, " ", "") // remove any empty strings
 		// parse the command type and content
 		cmdType := ""
 		cmdContent := ""
@@ -164,7 +166,8 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 			// if no DM can perform the read right now, abort
 			if !success {
-				s.abort(txnNumber)
+				//fmt.Print("Place 2\n")
+				s.abort(txnNumber, true, "no available DM can read from.")
 				continue
 			}
 			// read success, print and add to accessedDM
@@ -205,7 +208,8 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				if s.dmUpTable[managerNumber] {
 					txn.dmAccessed[managerNumber] = true
 				} else {
-					s.abort(txnNumber)
+					//fmt.Print("Place 3\n")
+					s.abort(txnNumber, true, "no available DM can write to.")
 					continue
 				}
 			}
@@ -216,18 +220,32 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 		case "dump":
 			// just do dumpRead on every DM
-			for i := 1; i < NUMBER_OF_DMS; i++ {
+			fmt.Print("keys   - ")
+			for i := 1; i <= 20; i++ {
+				fmt.Printf("x%-5d", i)
+			}
+			fmt.Println()
+			for i := 1; i <= NUMBER_OF_DMS; i++ {
 				s.dmCommandChans[i] <- &msg.Command{Type: msg.DumpRead}
 				res := <-s.dmResponseChans[i]
 				dumped := *res.PairsDumped
 				dumpedLen := len(dumped)
 				// print the results
-				fmt.Print("site ", i, " - ")
-				for j := 0; j < dumpedLen-1; j++ {
-					fmt.Print("x", dumped[j].Key, ": ", dumped[j].Value, ", ")
+				fmt.Printf("site%2d - ", i)
+				for j := 1; j < dumpedLen; j++ {
+					if dumped[j].Key != -1 {
+						fmt.Printf("%-5s ", fmt.Sprint(dumped[j].Value))
+					} else {
+						fmt.Printf("NA    ")
+					}
 				}
+				fmt.Println()
 				// print the last one without ", " but "\n"
-				fmt.Print("x", dumped[dumpedLen-1].Key, ": ", dumped[dumpedLen-1].Value, "\n")
+				// if dumped[dumpedLen-1].Key != -1 {
+				// 	fmt.Printf("x%d: %4s\n", dumped[dumpedLen-1].Key, fmt.Sprint(dumped[dumpedLen-1].Value))
+				// } else {
+				// 	fmt.Printf("x%d: %4s\n", dumpedLen, "NA")
+				// }
 			}
 
 		case "end":
@@ -239,7 +257,9 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			if !ok {
 				log.Fatal("Txn doesn't exist!!!")
 			} else if txn.state == aborted {
-				// if the txn is already aborted, just remove that
+				// if the txn is already aborted, just report aborted again
+				//fmt.Println("Place 7")
+				s.abort(txnNumber, false, "")
 				continue
 			}
 
@@ -249,8 +269,10 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			for _, write := range txn.writes {
 				if s.commitHistories[write.Key][len(s.commitHistories[write.Key])-1].timestamp >= txn.timeStart {
 					// someone else commited the value we wrote, so abort
-					s.abort(txnNumber)
+					//fmt.Print("Place 4\n")
+					s.abort(txnNumber, false, "first commiter wins.")
 					needAbort = true
+					break
 				}
 			}
 			if needAbort {
@@ -259,7 +281,8 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// enforcing SSI invariant by the graph
 			if !s.checkAndUpdateSerializationGraph(txnNumber) {
-				s.abort(txnNumber)
+				//fmt.Print("Place 5\n")
+				s.abort(txnNumber, false, "consecutive rw edges found.")
 				continue
 			}
 
@@ -291,8 +314,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 			txn.state = commited
 			s.txnRecords[txnNumber] = txn
-			// fmt.Print(s.commitHistories)
-			// fmt.Printf("COMMIT T%d", txnNumber)
+			fmt.Printf("T%d Commited\n", txnNumber)
 
 		case "fail":
 			// string processing
@@ -306,7 +328,8 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// abort all txns that accessed this DM
 			for _, txn := range s.txnRecords {
 				if txn.state == ongoing && txn.dmAccessed[managerNumber] {
-					s.abort(txn.txnNumber)
+					// fmt.Print("Place 1\n")
+					s.abort(txn.txnNumber, true, "accessed site crashed.")
 				}
 			}
 
@@ -326,16 +349,19 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 	}
 }
 
-func (s *TxnManagerState) abort(txnNumber int) {
+func (s *TxnManagerState) abort(txnNumber int, silent bool, reason string) {
 	_, ok := s.txnRecords[txnNumber]
 	if !ok {
 		log.Fatal("Txn doesn't exist!!!")
 	}
 
 	record := s.txnRecords[txnNumber]
+	record.reason += reason
 	record.state = aborted
 	s.txnRecords[txnNumber] = record
-	fmt.Printf("Aborting T%d \n", txnNumber)
+	if !silent {
+		fmt.Printf("T%d Aborted: %s\n", txnNumber, record.reason)
+	}
 }
 
 func (s *TxnManagerState) checkAndUpdateSerializationGraph(txnNumber int) bool {
