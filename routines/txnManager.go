@@ -86,6 +86,20 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 }
 
 func (s *TxnManagerState) TxnManagerRoutine() {
+	// Open the file for writing, appending, and create it if it doesn't exist
+	file, err := os.OpenFile("output.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed opening file: %s", err)
+	}
+	defer file.Close()
+
+	// Redirect the output of fmt.Printf to the file
+	oldStdout := os.Stdout
+	os.Stdout = file
+	defer func() { os.Stdout = oldStdout }()
+
+	// print a divider to output file
+	fmt.Printf("\n----------------------------\n")
 
 	for {
 		reader := bufio.NewReader(os.Stdin)
@@ -154,9 +168,15 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				continue
 			} else {
 				for i := 1; i <= NUMBER_OF_DMS; i++ {
-					// NOTE: we can do load balancing with mod function here
-					// but we don't have concurrency, so, forget about it
-					s.dmCommandChans[i] <- &msg.Command{Type: msg.Read, Pair: msg.Pair{Key: key}, Timestamp: txn.timeStart}
+					// we looup what is the last commited version of this key before this txn starts
+					versionNeeded := uint64(0)
+					for _, history := range s.commitHistories[key] {
+						if history.timestamp >= txn.timeStart {
+							break
+						}
+						versionNeeded = history.timestamp
+					}
+					s.dmCommandChans[i] <- &msg.Command{Type: msg.Read, Pair: msg.Pair{Key: key}, ExtraTimestamp: s.timeNow, VersionNeeded: versionNeeded}
 					res = <-s.dmResponseChans[i]
 					if res.Type == msg.Read {
 						success = true
@@ -171,7 +191,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				continue
 			}
 			// read success, print and add to accessedDM
-			fmt.Println("x", key, ": ", res.Pair.Value)
+			fmt.Printf("T%d Reads (x%d = %d)\n", txnNumber, key, res.Pair.Value)
 			// update the bookkeeping stuff
 			txn.reads[res.Pair.Key] = res.Pair
 			txn.readFroms[res.Pair.WhoWrote] = true
@@ -194,24 +214,35 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// or only one DM if the pair is not being replicated
 			// but the writes should not be visible to other transactions
 			// until this transaction commits, so we don't really write to
-			// the data managers, we defer the actual writes to the commit
+			// the data managers, we defer the actual writes to the commit,
+			// but the DMs still record the access history
 
 			// check if the target pair is replicated or not
 			if isReplicated(key) {
+				fmt.Printf("T%d Writes (x%d = %d) to sites: ", txnNumber, key, value)
 				// add all nodes that are currently up into the dmAccessed
 				for i := 1; i <= NUMBER_OF_DMS; i++ {
 					txn.dmAccessed[i] = s.dmUpTable[i]
+					s.dmCommandChans[i] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow}
+					res := <-s.dmResponseChans[i]
+					if res.Type == msg.Success {
+						fmt.Printf("%d ", i)
+					}
 				}
+				fmt.Println()
 			} else {
 				// if the DM is up, record accessed, otherwise abort
 				managerNumber := locateUnreplicated(key)
 				if s.dmUpTable[managerNumber] {
 					txn.dmAccessed[managerNumber] = true
+					s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow}
+					<-s.dmResponseChans[managerNumber]
 				} else {
 					//fmt.Print("Place 3\n")
 					s.abort(txnNumber, true, "no available DM can write to.")
 					continue
 				}
+				fmt.Printf("T%d Writes (x%d = %d) to site %d\n", txnNumber, key, value, managerNumber)
 			}
 
 			// record the writes, if there were earlier value written, simply overwrite
@@ -297,7 +328,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 			for i := 1; i <= NUMBER_OF_DMS; i++ {
 				if s.dmUpTable[i] {
-					s.dmCommandChans[i] <- &msg.Command{Type: msg.Commit, WritesToCommit: &writesToCommit, Timestamp: s.timeNow}
+					s.dmCommandChans[i] <- &msg.Command{Type: msg.Commit, WritesToCommit: &writesToCommit, Timestamp: s.timeNow, TxnNumber: txnNumber}
 				}
 			}
 			for i := 1; i <= NUMBER_OF_DMS; i++ {
@@ -319,7 +350,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 		case "fail":
 			// string processing
 			managerNumber, _ := strconv.Atoi(cmdContent)
-			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Fail}
+			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Fail, Timestamp: s.timeNow}
 			<-s.dmResponseChans[managerNumber]
 
 			// mark this DM as down
@@ -337,10 +368,15 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			// string processing
 			managerNumber, _ := strconv.Atoi(cmdContent)
 			// fmt.Println(cmdContent)
-			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover}
+			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover, Timestamp: s.timeNow}
 			<-s.dmResponseChans[managerNumber]
 			// mark this DM as up
 			s.dmUpTable[managerNumber] = true
+
+		case "flush":
+			// return to main so that the output file is closed
+			// and the database will be re-initialized
+			return
 
 		default:
 			log.Fatal("Unknown Command!!!")
@@ -401,7 +437,7 @@ func (s *TxnManagerState) checkAndUpdateSerializationGraph(txnNumber int) bool {
 	}
 	// check & update
 	if serialGraph.HasCycleWithConsecutiveRWEdges() {
-		fmt.Printf("Aborting T%d because cycle with rw - rw\n", txnNumber)
+		// fmt.Printf("Aborting T%d because cycle with rw - rw\n", txnNumber)
 		return false
 	} else {
 		s.serialGraph = serialGraph

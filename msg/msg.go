@@ -33,6 +33,8 @@ type Command struct {
 	TxnNumber      int
 	SiteNumber     int
 	Timestamp      uint64
+	ExtraTimestamp uint64
+	VersionNeeded  uint64
 	WritesToCommit *[]Pair
 }
 

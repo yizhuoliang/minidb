@@ -1,0 +1,727 @@
+x 2 :  20
+x 1 :  10
+T1 Commited
+T2 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 101   102   NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    102   30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    102   NA    40    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    102   NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    102   NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 3 :  30
+T2 Commited
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    88    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    91    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 3 :  30
+T2 Aborted: accessed site crashed.
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    91    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    91    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    91    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    91    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    91    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+
+----------------------------
+x 3 :  30
+x 3 :  30
+T2 Aborted: accessed site crashed.
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    91    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    91    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    91    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    91    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    91    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 3 :  30
+T2 Aborted: accessed site crashed.
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    91    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    91    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    91    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    91    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 3 :  30
+T2 Aborted: accessed site crashed.
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    91    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    91    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    91    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    91    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    91    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    91    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 5 :  50
+T2 Commited
+T1 Aborted: accessed site crashed.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    88    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 3 :  30
+x 5 :  50
+T2 Commited
+T1 Aborted: accessed site crashed.
+
+----------------------------
+T1 Writes (x6 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+x 3 :  30
+x 5 :  50
+T2 Commited
+T1 Aborted: accessed site crashed.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    88    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 1 :  10
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+x 3 :  30
+T2 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    88    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 1 :  10
+x 2 :  20
+T1 Writes (x3 = 33) to site 4
+T1 Commited
+x 3 :  30
+T2 Commited
+
+----------------------------
+x 1 :  10
+x 2 :  20
+T1 Writes (x3 = 33) to site 4
+T1 Commited
+x 3 :  33
+x 3 :  30
+T2 Commited
+T3 Commited
+
+----------------------------
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+x 4 :  40
+T2 Commited
+T3 Commited
+x 2 :  20
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    22    NA    44    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    22    30    44    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    22    NA    44    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    22    NA    44    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    22    NA    44    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+x 4 :  40
+T2 Commited
+T3 Commited
+x 2 :  20
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    22    NA    44    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    22    30    44    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    22    NA    44    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    22    NA    44    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    22    NA    44    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+x 4 :  40
+T2 Commited
+T3 Commited
+x 2 :  22
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    22    NA    44    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    22    30    44    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    22    NA    44    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    22    NA    44    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    22    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    22    NA    44    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+x 2 :  20
+x 2 :  20
+T2 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Commited
+T2 Commited
+
+----------------------------
+x 2 :  20
+x 2 :  20
+T1 Commited
+T2 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Commited
+
+----------------------------
+T3 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 20) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x2 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 Commited
+T2 Aborted: first commiter wins.
+T1 Aborted: first commiter wins.
+
+----------------------------
+T3 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x2 = 20) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Commited
+T3 Aborted: first commiter wins.
+T2 Aborted: first commiter wins.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T1 Writes (x4 = 5) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 3 4 5 6 7 8 9 10 
+T3 Writes (x4 = 55) to sites: 1 2 3 4 5 6 7 8 9 10 
+T4 Writes (x4 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T5 Writes (x4 = 77) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Aborted: accessed site crashed.
+T2 Commited
+T3 Aborted: first commiter wins.
+T4 Aborted: first commiter wins.
+T5 Aborted: first commiter wins.
+
+----------------------------
+T1 Writes (x4 = 5) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 3 4 5 6 7 8 9 10 
+T3 Writes (x4 = 55) to sites: 1 2 3 4 5 6 7 8 9 10 
+T4 Writes (x4 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T5 Writes (x4 = 77) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Aborted: accessed site crashed.
+T2 Commited
+T3 Aborted: first commiter wins.
+T4 Aborted: first commiter wins.
+T5 Aborted: first commiter wins.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    44    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    44    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    44    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    44    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    44    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+x 4 :  40
+T2 Commited
+T3 Commited
+x 2 :  22
+T1 Commited
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x3 = 44) to site 4
+x 3 :  30
+T2 Commited
+T3 Aborted: accessed site crashed.
+x 2 :  20
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    44    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+
+----------------------------
+T4 reads (x4 = 40)
+T5 reads (x5 = 50)
+T1 reads (x1 = 10)
+T1 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 reads (x2 = 20)
+T2 Writes (x3 = 20) to site 4
+T3 reads (x3 = 30)
+T3 Writes (x4 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T4 Writes (x5 = 40) to site 6
+T5 Writes (x1 = 50) to site 2
+T4 Commited
+T3 Commited
+T2 Commited
+Aborting T1 because cycle with rw - rw
+T1 Aborted: consecutive rw edges found.
+T5 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    30    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 50    20    NA    30    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    30    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    20    30    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    30    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    30    40    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    30    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    30    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    30    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    30    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T3 Writes (x3 = 300) to site 4
+T4 reads (x4 = 40)
+T5 reads (x5 = 50)
+T1 reads (x6 = 60)
+T2 reads (x2 = 20)
+T1 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x3 = 20) to site 4
+T3 Writes (x4 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T5 Writes (x1 = 50) to site 2
+T5 Commited
+T4 Writes (x5 = 40) to site 6
+T4 Commited
+T3 Aborted: accessed site crashed.
+T2 Commited
+T1 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    10    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 50    10    NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    10    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    10    20    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    10    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    10    NA    40    40    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    10    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    10    NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    10    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    10    NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T2 reads (x2 = 20)
+T1 Writes (x2 = 202) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 302) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Commited
+T2 Aborted: first commiter wins.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    202   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    202   NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    202   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    202   30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    202   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    202   NA    40    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    202   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    202   NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    202   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    202   NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T1 reads (x2 = 20)
+T2 reads (x4 = 40)
+T1 Writes (x4 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 90) to sites: 1 2 3 4 5 6 7 8 9 10 
+Aborting T1 because cycle with rw - rw
+T1 Aborted: consecutive rw edges found.
+T2 Commited
+
+----------------------------
+T1 Writes (x2 = 80) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x4 = 50) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 reads (x4 = 40)
+T1 Commited
+T2 Writes (x6 = 90) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 reads (x6 = 60)
+T3 Writes (x2 = 70) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Commited
+Aborting T3 because cycle with rw - rw
+T3 Aborted: consecutive rw edges found.
+
+----------------------------
+T1 reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 reads (x3 = 30)
+T2 Commited
+
+----------------------------
+T1 reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 reads (x3 = 30)
+T2 Commited
+T3 Aborted: no available DM can read from.
+
+----------------------------
+T1 reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 reads (x3 = 30)
+T2 Commited
+T4 Writes (x8 = 99) to sites: 3 4 
+T4 Commited
+T3 reads (x8 = 80)
+T3 Commited
+
+----------------------------
+T1 reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 reads (x3 = 30)
+T2 Commited
+T4 Writes (x8 = 99) to sites: 3 4 
+T4 Commited
+T3 reads (x8 = 80)
+T3 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    88    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    99    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    99    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+
+----------------------------
+T1 Reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 Reads (x3 = 30)
+T2 Commited
+T4 Writes (x8 = 99) to sites: 3 4 
+T4 Commited
+T3 Aborted: no available DM can read from.
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    88    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    99    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    99    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T1 Reads (x2 = 20)
+T2 Reads (x4 = 40)
+T1 Writes (x4 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 90) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Aborted: consecutive rw edges found.
+T2 Commited
+
+----------------------------
+T1 Writes (x1 = 101) to site 2
+T2 Writes (x2 = 202) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x2 = 102) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x1 = 201) to site 2
+T2 Commited
+T1 Aborted: first commiter wins.
+
+----------------------------
+T1 Writes (x1 = 101) to site 2
+T2 Reads (x2 = 20)
+T1 Writes (x2 = 102) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Reads (x1 = 10)
+T1 Commited
+T2 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 101   102   NA    40    NA    60    NA    80    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    102   30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    102   NA    40    50    60    NA    80    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    102   NA    40    NA    60    70    80    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    102   NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    102   NA    40    NA    60    NA    80    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T1 Reads (x3 = 30)
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Writes (x5 = 91) to site 6
+T2 Commited
+T1 Commited
+
+----------------------------
+T1 Reads (x3 = 30)
+T2 Writes (x8 = 88) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Writes (x4 = 91) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Aborted: accessed site crashed.
+T1 Commited
+
+----------------------------
+T1 Reads (x3 = 30)
+T2 Writes (x8 = 88) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Writes (x4 = 91) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Aborted: accessed site crashed.
+T1 Commited
+
+----------------------------
+T1 Writes (x1 = 512) to site 2
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Reads (x5 = 50)
+T2 Commited
+T1 Aborted: accessed site crashed.
+
+----------------------------
+T1 Writes (x6 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Reads (x5 = 50)
+T2 Commited
+T1 Aborted: accessed site crashed.
+
+----------------------------
+T1 Writes (x1 = 512) to site 2
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Reads (x5 = 50)
+T2 Commited
+T1 Aborted: accessed site crashed.
+
+----------------------------
+T1 Writes (x6 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x8 = 88) to sites: 1 3 4 5 6 7 8 9 10 
+T2 Reads (x3 = 30)
+T1 Reads (x5 = 50)
+T2 Commited
+T1 Aborted: accessed site crashed.
+
+----------------------------
+T1 Reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 Reads (x3 = 30)
+T2 Commited
+keys   - x1    x2    x3    x4    x5    x6    x7    x8    x9    x10   x11   x12   x13   x14   x15   x16   x17   x18   x19   x20   
+site 1 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 2 - 10    20    NA    40    NA    60    NA    88    NA    100   110   120   NA    140   NA    160   NA    180   NA    200   
+site 3 - NA    20    NA    40    NA    60    NA    80    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 4 - NA    20    30    40    NA    60    NA    80    NA    100   NA    120   130   140   NA    160   NA    180   NA    200   
+site 5 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 6 - NA    20    NA    40    50    60    NA    88    NA    100   NA    120   NA    140   150   160   NA    180   NA    200   
+site 7 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site 8 - NA    20    NA    40    NA    60    70    88    NA    100   NA    120   NA    140   NA    160   170   180   NA    200   
+site 9 - NA    20    NA    40    NA    60    NA    88    NA    100   NA    120   NA    140   NA    160   NA    180   NA    200   
+site10 - NA    20    NA    40    NA    60    NA    88    90    100   NA    120   NA    140   NA    160   NA    180   190   200   
+
+----------------------------
+T2 Reads (x1 = 10)
+T2 Reads (x2 = 20)
+T1 Writes (x3 = 33) to site 4
+T1 Commited
+T2 Reads (x3 = 30)
+T2 Commited
+
+----------------------------
+T2 Reads (x1 = 10)
+T2 Reads (x2 = 20)
+T1 Writes (x3 = 33) to site 4
+T1 Commited
+T3 Reads (x3 = 33)
+T2 Reads (x3 = 30)
+T2 Commited
+T3 Commited
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 Reads (x4 = 40)
+T2 Commited
+T3 Commited
+T1 Reads (x2 = 20)
+T1 Commited
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 Reads (x4 = 40)
+T2 Commited
+T3 Commited
+T1 Reads (x2 = 22)
+T1 Commited
+
+----------------------------
+T1 Reads (x2 = 20)
+T2 Reads (x2 = 20)
+T2 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Commited
+T2 Commited
+
+----------------------------
+T1 Reads (x2 = 20)
+T2 Reads (x2 = 20)
+T1 Commited
+T2 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Commited
+
+----------------------------
+T3 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 20) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x2 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 Commited
+T2 Aborted: first commiter wins.
+T1 Aborted: first commiter wins.
+
+----------------------------
+T3 Writes (x2 = 10) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Writes (x2 = 20) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x2 = 30) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Commited
+T3 Aborted: first commiter wins.
+T2 Aborted: first commiter wins.
+
+----------------------------
+T1 Writes (x4 = 5) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 3 4 5 6 7 8 9 10 
+T3 Writes (x4 = 55) to sites: 1 2 3 4 5 6 7 8 9 10 
+T4 Writes (x4 = 66) to sites: 1 2 3 4 5 6 7 8 9 10 
+T5 Writes (x4 = 77) to sites: 1 2 3 4 5 6 7 8 9 10 
+T1 Aborted: accessed site crashed.
+T2 Commited
+T3 Aborted: first commiter wins.
+T4 Aborted: first commiter wins.
+T5 Aborted: first commiter wins.
+
+----------------------------
+T3 Writes (x2 = 22) to sites: 1 2 3 4 5 6 7 8 9 10 
+T2 Writes (x4 = 44) to sites: 1 2 3 4 5 6 7 8 9 10 
+T3 Reads (x4 = 40)
+T2 Commited
+T3 Commited
+T1 Reads (x2 = 22)
+T1 Commited
+
+----------------------------
+T1 Reads (x1 = 10)
+T2 Writes (x8 = 88) to sites: 1 2 5 6 7 8 9 10 
+T1 Commited
+T2 Reads (x3 = 30)
+T2 Commited
+T4 Writes (x8 = 99) to sites: 3 4 
+T4 Commited
+T3 Aborted: no available DM can read from.
+
+----------------------------
