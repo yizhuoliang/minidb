@@ -6,25 +6,27 @@ import (
 )
 
 type DataManagerState struct {
-	managerNumber  int
-	isUp           bool
-	table          [21][]msg.Pair
-	readyTable     [21]bool
-	failureRecords map[uint64]uint64 // map from crashing time to restore time
-	accessRecords  map[int]uint64    // map from txnNumber to the earliest time of accessing this DM
-	commandChan    chan *msg.Command
-	responseChan   chan *msg.Response
+	managerNumber    int
+	isUp             bool
+	table            [21][]msg.Pair
+	readyTable       [21]bool
+	failureRecords   map[uint64]uint64 // map from crashing time to restore time
+	accessRecords    map[int]uint64    // map from txnNumber to the earliest time of accessing this DM
+	commandChan      chan *msg.Command
+	responseChan     chan *msg.Response
+	uncommitedWrites []msg.Pair
 }
 
 func NewDataManager(managerNumber int, commandChan chan *msg.Command, responseChan chan *msg.Response, initTime uint64) DataManagerState {
 	// build a new DM state
 	newDM := DataManagerState{
-		managerNumber:  managerNumber,
-		isUp:           true,
-		commandChan:    commandChan,
-		responseChan:   responseChan,
-		failureRecords: make(map[uint64]uint64),
-		accessRecords:  make(map[int]uint64),
+		managerNumber:    managerNumber,
+		isUp:             true,
+		commandChan:      commandChan,
+		responseChan:     responseChan,
+		failureRecords:   make(map[uint64]uint64),
+		accessRecords:    make(map[int]uint64),
+		uncommitedWrites: make([]msg.Pair, 0),
 	}
 
 	// initialize the data tables
@@ -87,6 +89,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 			if !ok {
 				s.accessRecords[command.TxnNumber] = command.Timestamp
 			}
+			s.uncommitedWrites = append(s.uncommitedWrites, command.Pair)
 			if s.isUp {
 				s.responseChan <- &msg.Response{Type: msg.Success}
 			} else {
@@ -105,6 +108,7 @@ func (s *DataManagerState) DataManagerRoutine() {
 				s.responseChan <- &msg.Response{Type: msg.Error}
 				continue
 			}
+			commitedKeys := make([]int, 0)
 			for _, write := range *command.WritesToCommit {
 				// if the table entry is empty, this dataManager don't maintain this variable
 				// so it can ignore this update
@@ -112,10 +116,11 @@ func (s *DataManagerState) DataManagerRoutine() {
 					continue
 				}
 				s.table[write.Key] = append(s.table[write.Key], msg.Pair{Key: write.Key, Value: write.Value, Timestamp: command.Timestamp, WhoWrote: write.WhoWrote})
+				commitedKeys = append(commitedKeys, write.Key)
 				s.readyTable[write.Key] = true
 			}
 
-			s.responseChan <- &msg.Response{Type: msg.Success}
+			s.responseChan <- &msg.Response{Type: msg.Success, CommitedKeys: commitedKeys, ManagerNumber: s.managerNumber}
 
 		case msg.Fail:
 			// record this incident
@@ -142,7 +147,18 @@ func (s *DataManagerState) DataManagerRoutine() {
 			for key := 2; key <= 20; key += 2 {
 				s.readyTable[key] = false
 			}
-			s.responseChan <- &msg.Response{Type: msg.Success}
+
+			// look through the waiting reads list
+			waitingReads := make([]msg.Pair, 0)
+			for _, pair := range *command.WaitingReads {
+				versions := s.table[pair.Key]
+				for _, version := range versions {
+					if version.Timestamp == pair.Timestamp {
+						waitingReads = append(waitingReads, version)
+					}
+				}
+			}
+			s.responseChan <- &msg.Response{Type: msg.Success, WaitingReads: &waitingReads}
 
 		case msg.DumpRead:
 			dumped := make([]msg.Pair, 0)

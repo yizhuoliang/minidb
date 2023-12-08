@@ -32,19 +32,25 @@ const (
 )
 
 type txnRecord struct {
-	state      state
-	txnNumber  int
-	timeStart  uint64
-	writes     map[int]msg.Pair // map from key to pair
-	reads      map[int]msg.Pair // map from key to pair
-	readFroms  map[int]bool     // NOTE: map from txnNumber to bool
-	dmAccessed [NUMBER_OF_DMS + 1]bool
-	reason     string
+	state        state
+	txnNumber    int
+	timeStart    uint64
+	writes       map[int]msg.Pair // map from key to pair
+	reads        map[int]msg.Pair // map from key to pair
+	readFroms    map[int]bool     // NOTE: map from txnNumber to bool
+	dmAccessed   [NUMBER_OF_DMS + 1]bool
+	reason       string
+	dmFailed     [NUMBER_OF_DMS + 1]bool // DMs that failed during txn execution
+	isWaiting    bool
+	waitingSites []int
+	waitingKey   int
+	waitingTime  uint64
 }
 
 type commitHistory struct {
-	timestamp uint64
-	txnNumber int
+	timestamp    uint64
+	txnNumber    int
+	siteCommited []int
 }
 
 type TxnManagerState struct {
@@ -55,11 +61,13 @@ type TxnManagerState struct {
 	dmCommandChans  []chan *msg.Command
 	dmResponseChans []chan *msg.Response
 	serialGraph     *graph.Graph
+	waitingCommands []string
+	waitingTxns     map[int]bool
 }
 
 func NewTxnManagerAndDataManagers() TxnManagerState {
 	// create & init new TM
-	newTM := TxnManagerState{timeNow: 0, txnRecords: make(map[int]txnRecord, 0),
+	newTM := TxnManagerState{timeNow: 0, txnRecords: make(map[int]txnRecord, 0), waitingCommands: make([]string, 0),
 		dmCommandChans: make([]chan *msg.Command, 11), dmResponseChans: make([]chan *msg.Response, 11)}
 	for i := 1; i <= NUMBER_OF_DMS; i++ {
 		newTM.dmUpTable[i] = true
@@ -67,7 +75,15 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 		newTM.dmResponseChans[i] = make(chan *msg.Response)
 	}
 	for i := 1; i <= 20; i++ {
-		newTM.commitHistories[i] = []commitHistory{{timestamp: newTM.timeNow, txnNumber: 0}}
+		historyEntry := commitHistory{timestamp: 0, siteCommited: make([]int, 0)}
+		if isReplicated(i) {
+			for j := 1; j <= NUMBER_OF_DMS; j++ {
+				historyEntry.siteCommited = append(historyEntry.siteCommited, j)
+			}
+		} else {
+			historyEntry.siteCommited = append(historyEntry.siteCommited, locateUnreplicated(i))
+		}
+		newTM.commitHistories[i] = []commitHistory{historyEntry}
 	}
 
 	// create new DMs
@@ -85,7 +101,14 @@ func NewTxnManagerAndDataManagers() TxnManagerState {
 	return newTM
 }
 
-func (s *TxnManagerState) TxnManagerRoutine() {
+func (s *TxnManagerState) TxnManagerRoutine(inputFilePath string) {
+	// open the file to read from
+	inFile, inErr := os.Open(inputFilePath)
+	if inErr != nil {
+		log.Fatal(inErr)
+	}
+	defer inFile.Close()
+
 	// Open the file for writing, appending, and create it if it doesn't exist
 	file, err := os.OpenFile("output.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -101,11 +124,23 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 	// print a divider to output file
 	fmt.Printf("\n----------------------------\n")
 
+	// Create a Scanner to read the file
+	scanner := bufio.NewScanner(inFile)
+
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal("Error reading input:", err)
+		if !scanner.Scan() {
+			break // No more lines, terminates
+		}
+
+		input := scanner.Text()
+		// remove comments if there is any
+		index := strings.Index(input, "//")
+		if index != -1 {
+			input = input[:index]
+		}
+		// Check for blank line
+		if strings.TrimSpace(input) == "" {
+			continue // Skip blank or comment lines
 		}
 
 		// for every command, increment time!!
@@ -157,6 +192,16 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			if !ok {
 				log.Fatal("Txn doesn't exist!!!")
 			}
+			// we looup what is the last commited version of this key before this txn starts
+			versionNeeded := uint64(0)
+			var dmNeeded []int = make([]int, 0)
+			for _, history := range s.commitHistories[key] {
+				if history.timestamp >= txn.timeStart {
+					break
+				}
+				versionNeeded = history.timestamp
+				dmNeeded = history.siteCommited
+			}
 			// first enforce "read your own writes"
 			// then try to read from DMs, try from site 1 to 10
 			success := false
@@ -168,14 +213,6 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				continue
 			} else {
 				for i := 1; i <= NUMBER_OF_DMS; i++ {
-					// we looup what is the last commited version of this key before this txn starts
-					versionNeeded := uint64(0)
-					for _, history := range s.commitHistories[key] {
-						if history.timestamp >= txn.timeStart {
-							break
-						}
-						versionNeeded = history.timestamp
-					}
 					s.dmCommandChans[i] <- &msg.Command{Type: msg.Read, Pair: msg.Pair{Key: key}, ExtraTimestamp: s.timeNow, VersionNeeded: versionNeeded}
 					res = <-s.dmResponseChans[i]
 					if res.Type == msg.Read {
@@ -184,8 +221,34 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 					}
 				}
 			}
-			// if no DM can perform the read right now, abort
+			// if no DM can perform the read right now, decide on wait or abort
 			if !success {
+				// look at the version needed's commit history
+				// see if one of the DM failed finished during this txn's execution
+				waiting := false
+				if dmNeeded == nil {
+					s.abort(txnNumber, true, "no available DM can read from.")
+					continue
+				}
+				for _, dmn := range dmNeeded {
+					if txn.dmFailed[dmn] && s.dmUpTable[dmn] == false {
+						// now we can wait!
+						if txn.isWaiting == false {
+							fmt.Printf("T%d is Waiting\n", txnNumber)
+							txn.isWaiting = true
+							txn.waitingSites = make([]int, 0)
+							txn.waitingKey = key
+							txn.waitingTime = versionNeeded
+						}
+						waiting = true
+						txn.waitingSites = append(txn.waitingSites, dmn)
+					}
+				}
+				if waiting {
+					s.txnRecords[txnNumber] = txn
+					continue
+				}
+				// if can't wait, abort
 				//fmt.Print("Place 2\n")
 				s.abort(txnNumber, true, "no available DM can read from.")
 				continue
@@ -219,11 +282,11 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// check if the target pair is replicated or not
 			if isReplicated(key) {
-				fmt.Printf("T%d Writes (x%d = %d) to sites: ", txnNumber, key, value)
+				fmt.Printf("T%d Writes uncommited value (x%d = %d) to sites: ", txnNumber, key, value)
 				// add all nodes that are currently up into the dmAccessed
 				for i := 1; i <= NUMBER_OF_DMS; i++ {
 					txn.dmAccessed[i] = s.dmUpTable[i]
-					s.dmCommandChans[i] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow}
+					s.dmCommandChans[i] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow, Pair: msg.Pair{Key: key, Value: value}}
 					res := <-s.dmResponseChans[i]
 					if res.Type == msg.Success {
 						fmt.Printf("%d ", i)
@@ -235,7 +298,7 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				managerNumber := locateUnreplicated(key)
 				if s.dmUpTable[managerNumber] {
 					txn.dmAccessed[managerNumber] = true
-					s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow}
+					s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Write, TxnNumber: txnNumber, Timestamp: s.timeNow, Pair: msg.Pair{Key: key, Value: value}}
 					<-s.dmResponseChans[managerNumber]
 				} else {
 					//fmt.Print("Place 3\n")
@@ -292,6 +355,9 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 				//fmt.Println("Place 7")
 				s.abort(txnNumber, false, "")
 				continue
+			} else if txn.isWaiting == true {
+				fmt.Printf("ERROR! T%d is still waiting, cant be commited!\n", txnNumber)
+				continue
 			}
 
 			// enforcing the "first commiter wins" rule
@@ -319,12 +385,14 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 
 			// this txn is cleared, send Commit commands to DMs
 			writesToCommit := make([]msg.Pair, 0)
+			keyToCommitedSites := make(map[int][]int, 0)
 			for _, write := range txn.writes {
 				// update the timestamp!!
 				write.Timestamp = s.timeNow
 				write.WhoWrote = txnNumber
 				txn.writes[write.Key] = write
 				writesToCommit = append(writesToCommit, write)
+				keyToCommitedSites[write.Key] = make([]int, 0)
 			}
 			for i := 1; i <= NUMBER_OF_DMS; i++ {
 				if s.dmUpTable[i] {
@@ -333,14 +401,27 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			}
 			for i := 1; i <= NUMBER_OF_DMS; i++ {
 				if s.dmUpTable[i] {
-					<-s.dmResponseChans[i]
+					res := <-s.dmResponseChans[i]
+					if res.Type == msg.Success {
+						for _, commitedKey := range res.CommitedKeys {
+							sites, ok := keyToCommitedSites[commitedKey]
+							if ok {
+								sites = append(sites, res.ManagerNumber)
+							}
+							keyToCommitedSites[commitedKey] = sites
+						}
+					}
 				}
 			}
 
 			// record this commit to the commit histories
 			for _, write := range txn.writes {
 				history := s.commitHistories[write.Key]
-				history = append(history, commitHistory{timestamp: write.Timestamp, txnNumber: txnNumber})
+				historyEntry := commitHistory{timestamp: write.Timestamp, txnNumber: txnNumber, siteCommited: make([]int, 0)}
+				for _, site := range keyToCommitedSites[write.Key] {
+					historyEntry.siteCommited = append(historyEntry.siteCommited, site)
+				}
+				history = append(history, historyEntry)
 				s.commitHistories[write.Key] = history
 			}
 			txn.state = commited
@@ -357,26 +438,56 @@ func (s *TxnManagerState) TxnManagerRoutine() {
 			s.dmUpTable[managerNumber] = false
 
 			// abort all txns that accessed this DM
-			for _, txn := range s.txnRecords {
+			for key, txn := range s.txnRecords {
 				if txn.state == ongoing && txn.dmAccessed[managerNumber] {
 					// fmt.Print("Place 1\n")
 					s.abort(txn.txnNumber, true, "accessed site crashed.")
+				} else if txn.state == ongoing {
+					txn.dmFailed[managerNumber] = true
+					s.txnRecords[key] = txn
 				}
 			}
 
 		case "recover":
 			// string processing
 			managerNumber, _ := strconv.Atoi(cmdContent)
-			// fmt.Println(cmdContent)
-			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover, Timestamp: s.timeNow}
-			<-s.dmResponseChans[managerNumber]
+			waitingReads := make([]msg.Pair, 0)
+			for _, txn := range s.txnRecords {
+				if txn.state == ongoing && txn.isWaiting {
+					for _, dmn := range txn.waitingSites {
+						if dmn == managerNumber {
+							waitingReads = append(waitingReads, msg.Pair{Key: txn.waitingKey, Timestamp: txn.waitingTime})
+							break
+						}
+					}
+				}
+			}
+			s.dmCommandChans[managerNumber] <- &msg.Command{Type: msg.Recover, Timestamp: s.timeNow, WaitingReads: &waitingReads}
+			res := <-s.dmResponseChans[managerNumber]
+			for _, txn := range s.txnRecords {
+				if txn.state == ongoing && txn.isWaiting {
+					for _, pair := range *res.WaitingReads {
+						if pair.Key == txn.waitingKey && pair.Timestamp == txn.waitingTime {
+							// this txn can continue!
+							fmt.Printf("T%d Reads (x%d = %d)\n", txn.txnNumber, pair.Key, pair.Value)
+							txn.dmAccessed[managerNumber] = true
+							txn.readFroms[pair.WhoWrote] = true
+							txn.isWaiting = false
+							s.txnRecords[txn.txnNumber] = txn
+						}
+					}
+				}
+			}
 			// mark this DM as up
 			s.dmUpTable[managerNumber] = true
 
 		case "flush":
 			// return to main so that the output file is closed
 			// and the database will be re-initialized
-			return
+			// print a divider to output file
+			fmt.Printf("\n----------------------------\n")
+			newState := NewTxnManagerAndDataManagers()
+			s = &newState
 
 		default:
 			log.Fatal("Unknown Command!!!")

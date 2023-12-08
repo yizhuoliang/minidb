@@ -36,6 +36,7 @@ type Command struct {
 	ExtraTimestamp uint64
 	VersionNeeded  uint64
 	WritesToCommit *[]Pair
+	WaitingReads   *[]Pair
 }
 
 type Response struct {
@@ -44,6 +45,8 @@ type Response struct {
 	TxnNumber     int
 	ManagerNumber int
 	PairsDumped   *[]Pair
+	CommitedKeys  []int
+	WaitingReads  *[]Pair
 }
 
 type TxnManagerState struct {
