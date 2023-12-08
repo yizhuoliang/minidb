@@ -35,6 +35,7 @@ type txnRecord struct {
 	state        state
 	txnNumber    int
 	timeStart    uint64
+	timeCommit   uint64
 	writes       map[int]msg.Pair // map from key to pair
 	reads        map[int]msg.Pair // map from key to pair
 	readFroms    map[int]bool     // NOTE: map from txnNumber to bool
@@ -425,6 +426,7 @@ func (s *TxnManagerState) TxnManagerRoutine(inputFilePath string) {
 				s.commitHistories[write.Key] = history
 			}
 			txn.state = commited
+			txn.timeCommit = s.timeNow
 			s.txnRecords[txnNumber] = txn
 			fmt.Printf("T%d Commited\n", txnNumber)
 
@@ -531,20 +533,23 @@ func (s *TxnManagerState) checkAndUpdateSerializationGraph(txnNumber int) bool {
 			if thisTxn.readFroms[otherTxn.txnNumber] {
 				serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "wr")
 			}
-		} else { // when otherTxn is ongoing
-			// RW EDGES, thisTxn write
-			for _, thisWrite := range thisTxn.writes {
-				if _, ok := otherTxn.reads[thisWrite.Key]; ok {
-					serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "rw")
-				}
-			}
-			// RW EDGES,
+
+			// RW EDGES, thisTxn read
 			for _, thisRead := range thisTxn.reads {
 				if _, ok := otherTxn.writes[thisRead.Key]; ok {
-					serialGraph.AddEdge(txnNumber, otherTxn.txnNumber, "rw")
+					if thisTxn.timeStart < otherTxn.timeCommit {
+						serialGraph.AddEdge(txnNumber, otherTxn.txnNumber, "rw")
+					}
 				}
 			}
 		}
+		// RW EDGES, thisTxn write
+		for _, thisWrite := range thisTxn.writes {
+			if _, ok := otherTxn.reads[thisWrite.Key]; ok {
+				serialGraph.AddEdge(otherTxn.txnNumber, txnNumber, "rw")
+			}
+		}
+
 	}
 	// check & update
 	if serialGraph.HasCycleWithConsecutiveRWEdges() {
